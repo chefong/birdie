@@ -1,0 +1,7 @@
+.map__container {
+  position: absolute;
+}
+
+.map__pin {
+  width: 6vh;
+}

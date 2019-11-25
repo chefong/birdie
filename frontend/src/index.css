@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Alata&display=swap');
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -10,4 +12,24 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+@font-face {
+  font-family: 'Product Sans';
+  src: url('./assets/fonts/Product Sans Regular.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Product Sans';
+  src: url('./assets/fonts/Product Sans Bold.ttf');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Product Sans';
+  src: url('./assets/fonts/Product Sans Italic.ttf');
+  font-weight: bold;
+  font-style: italic;
 }

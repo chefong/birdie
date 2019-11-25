@@ -1,0 +1,34 @@
+.results__back {
+  font-weight: bold;
+  z-index: 100;
+  margin-top: 8.75vh;
+}
+
+.results__back--wrapper {
+  text-align: center;
+}
+
+.results__logo {
+  width: 128px;
+  margin-top: 8vh;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.results__logo--wrapper {
+  text-align: center;
+}
+
+.anticon {
+  vertical-align: 0.1em;
+}
+
+.results__data {
+  text-align: center;
+  font-style: italic;
+  margin-top: 4vh;
+  font-size: 120%;
+}

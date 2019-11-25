@@ -1,0 +1,10 @@
+.panel__container {
+  height: 90vh;
+  background-color: white;
+  position: absolute;
+  z-index: 99;
+  margin-top: 5vh;
+  margin-left: 5vh;
+  width: 33vw;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
