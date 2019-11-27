@@ -3,10 +3,10 @@ import './App.css';
 import Map from './components/Map/Map';
 import Panel from './components/Panel/Panel';
 import { geolocated } from "react-geolocated";
-import { smallSampleData } from './smallSampleData';
 import { sampleData } from './sampleData';
 import { Spin, Icon } from 'antd';
 import birdie from './assets/birdie.svg';
+import { tweets } from './tweet';
 
 class App extends Component {
   state = {

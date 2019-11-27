@@ -1,2 +1,4 @@
-api_key = "QXLxfFP2a304CfnryrvvZfUNv"
-api_secret = "VF8WwNh1HSE9CQN8OxHcWc4xrJXIcxscDUn3X4MFA7qpYSuchQ"
+api_key = '4JNbWBY2ZvuqfeExVNSOJegLs'
+api_secret_key = '8OuWLkkxyi14TlGe3dYch67lP55xu1xXtLsSxOgp6K103mXcBB'
+access_token = '807395090293366784-ThtjS0gMyjLrRUFGsj4fNjr0czxOUnz'
+access_token_secret = 'HUwN0z3ledIpcWAHps4CWkqe06gTHwiPveKaUnlZn0mkh'

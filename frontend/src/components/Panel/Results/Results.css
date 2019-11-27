@@ -2,6 +2,7 @@
   font-weight: bold;
   z-index: 100;
   margin-top: 8.75vh;
+  border: 0.5px solid rgb(241, 241, 241);
 }
 
 .results__back--wrapper {
@@ -27,8 +28,6 @@
 }
 
 .results__data {
-  text-align: center;
-  font-style: italic;
   margin-top: 4vh;
-  font-size: 120%;
+  margin-bottom: 4vh;
 }

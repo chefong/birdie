@@ -1,0 +1,24 @@
+.tweet__user--image {
+  border-radius: 50%;
+}
+
+.tweet__user--url {
+  font-weight: normal;
+  color: rgb(160, 160, 160)
+}
+
+.tweet__container {
+  border: 0.5px solid rgb(241, 241, 241);
+  padding: 2vh;
+  margin-bottom: 2vh;
+  transition: 0.5s;
+}
+
+.tweet__container:hover {
+  border: 0.5px solid black;
+}
+
+.tweet__date {
+  font-size: 90%;
+  margin-bottom: 0.5vh;
+}
