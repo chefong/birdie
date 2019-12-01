@@ -6,8 +6,12 @@ from bs4 import BeautifulSoup
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
+from geopy.geocoders import Nominatim
 
 import config
+
+count = 0
+
 
 class TwitterStreamer():
     def __init__(self):
@@ -41,6 +45,8 @@ class StdOutListener(StreamListener):
                 newObject["url"] = url
 
     def on_data(self, data):
+        jsonList = []
+
         try:
             newObject = {}
             tweet = json.loads(data)
@@ -49,33 +55,57 @@ class StdOutListener(StreamListener):
                     newObject["content"] = tweet["extended_tweet"]["full_text"]
                 else:
                     newObject["content"] = tweet["text"]
+
                 newObject["user"] = {
                     "name": tweet["user"]["screen_name"],
-                    "location": tweet["user"]["location"]
                 }
                 newObject["entities"] = {
                     "hashtags": tweet["entities"]["hashtags"],
                     "urls": tweet["entities"]["urls"]
                 }
+                newObject["date"] = tweet["created_at"]
+                newObject["title"] = None
+                newObject["coordinates"] = None
 
                 if len(tweet["entities"]["urls"]) > 0:
                     self.scrapePage(tweet["entities"]["urls"], newObject)
-                    if "title" in newObject:
-                        print("this is title", newObject["title"])
-                        print("this is url", newObject["url"])
 
-                # newObject["date"] = tweet["created_at"]
-                # with open("tweets.json", 'a') as tf:
-                #     json.dump(newObject, tf)
+
+                try:
+                    newObject["coordinates"] = tweet["coordinates"]["coordinates"]
+                except:
+                    try:
+                        temp = tweet["user"]["location"]
+                        geolocator = Nominatim(user_agent="cs172")
+                        location = geolocator.geocode(temp)
+                        newObject["coordinates"] = [location.latitude, location.longitude]
+                    except:
+                        pass
+                    pass
+
+
+                with open("tweets.json", 'a') as tf:
+                    global count
+                    print(count)
+                    count += 1
+
+                    json.dump(newObject, tf)
+
             return True
 
-        except BaseException as e:
+        # except BaseException as e:
+        #     #exception if it doesn't meet the criteria
+        #     pass
+
+        except IncompleRead:
+            #streaming tweets faster than processesing so script breaks
             pass
 
         return True
 
     def on_error(self, status):
-        print(status)
+        print("status error", status)
+        return
 
 if __name__ == '__main__':
 
