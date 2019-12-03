@@ -6,19 +6,12 @@ from bs4 import BeautifulSoup
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
-<<<<<<< HEAD
 from geopy.geocoders import Nominatim
 
 import config
 
 count = 0
 
-
-=======
-
-import config
-
->>>>>>> b9eedffb94da14977706dd5be6fd12086851bb3e
 class TwitterStreamer():
     def __init__(self):
         pass
@@ -51,11 +44,6 @@ class StdOutListener(StreamListener):
                 newObject["url"] = url
 
     def on_data(self, data):
-<<<<<<< HEAD
-        jsonList = []
-
-=======
->>>>>>> b9eedffb94da14977706dd5be6fd12086851bb3e
         try:
             newObject = {}
             tweet = json.loads(data)
@@ -64,21 +52,15 @@ class StdOutListener(StreamListener):
                     newObject["content"] = tweet["extended_tweet"]["full_text"]
                 else:
                     newObject["content"] = tweet["text"]
-<<<<<<< HEAD
 
                 newObject["user"] = {
-                    "name": tweet["user"]["screen_name"],
-=======
-                newObject["user"] = {
-                    "name": tweet["user"]["screen_name"],
-                    "location": tweet["user"]["location"]
->>>>>>> b9eedffb94da14977706dd5be6fd12086851bb3e
+                    "user": tweet["user"]
                 }
                 newObject["entities"] = {
                     "hashtags": tweet["entities"]["hashtags"],
                     "urls": tweet["entities"]["urls"]
                 }
-<<<<<<< HEAD
+
                 newObject["date"] = tweet["created_at"]
                 newObject["title"] = None
                 newObject["coordinates"] = None
@@ -99,48 +81,24 @@ class StdOutListener(StreamListener):
                         pass
                     pass
 
+                if len(newObject["coordinates"]) > 0:
+                    with open("tweets.json", 'a') as tf:
+                        global count
+                        print(count)
+                        count += 1
 
-                with open("tweets.json", 'a') as tf:
-                    global count
-                    print(count)
-                    count += 1
+                        json.dump(newObject, tf)
 
-                    json.dump(newObject, tf)
-
-            return True
-
-        # except BaseException as e:
-        #     #exception if it doesn't meet the criteria
-        #     pass
-
-        except IncompleRead:
-            #streaming tweets faster than processesing so script breaks
-=======
-
-                if len(tweet["entities"]["urls"]) > 0:
-                    self.scrapePage(tweet["entities"]["urls"], newObject)
-                    if "title" in newObject:
-                        print("this is title", newObject["title"])
-                        print("this is url", newObject["url"])
-
-                # newObject["date"] = tweet["created_at"]
-                # with open("tweets.json", 'a') as tf:
-                #     json.dump(newObject, tf)
             return True
 
         except BaseException as e:
->>>>>>> b9eedffb94da14977706dd5be6fd12086851bb3e
             pass
 
         return True
 
     def on_error(self, status):
-<<<<<<< HEAD
         print("status error", status)
         return
-=======
-        print(status)
->>>>>>> b9eedffb94da14977706dd5be6fd12086851bb3e
 
 if __name__ == '__main__':
 

@@ -28,16 +28,15 @@ def gendata():
     file_read = file_input.read()
 
     for obj in decode_stacked(file_read):
-        print(obj)
         yield {
-            "_index": "testingtwo",
+            "_index": "tweetes",
             "_source": {
                 "content": obj["content"],
-                "coordinates": obj["coordinates"] if obj["coordinates"] else "",
+                "coordinates": obj["coordinates"],
                 "date": obj["date"],
-                "user": obj["user"],
+                "user": obj["user"]["user"],
                 "entities": obj["entities"],
-                "title": obj["title"] if obj["title"] else ""
+                "title": obj["title"]
             }
         }
 
