@@ -18,7 +18,7 @@ def coord_dist(long1, lat1, long2, lat2):
 
 @app.route("/search", methods=["POST"])
 def query():
-    es = Elasticsearch("http://localhost:9200")
+    es = Elasticsearch("https://ayvv1ysa0x:5yb4lybdko@tweets-2904168154.us-west-2.bonsaisearch.net:443")
 
     if request.get_json():
         valid_tweets = []
@@ -26,13 +26,17 @@ def query():
         data = request.get_json()
         input = data["query"]
         # Coordinates come in as latitude, longitude
-        coordinates = data["coordinates"]
+        latitude = data["latitude"]
+        longitude = data["longitude"]
+
+        print("latitude: ", latitude)
+        print("longitude: ", longitude)
 
         query = {
           "query": {
             "bool" : {
               "must" : {
-                "term" : { "content": input }
+                "match" : { "content": input }
               }
             }
           }
@@ -47,15 +51,14 @@ def query():
                 tweet_coord_lat = tweet_json['_source']['coordinates'][0]
                 tweet_coord_long = tweet_json['_source']['coordinates'][1]
 
-                distance = coord_dist(tweet_coord_long, tweet_coord_lat, coordinates[1], coordinates[0])
-                print(tweet_json)
-                print(distance)
+                distance = coord_dist(tweet_coord_long, tweet_coord_lat, longitude, latitude)
 
                 if distance <= 100:
+                    print(tweet_json)
+                    print(distance)
                     valid_tweets.append(tweet_json)
 
-        print(valid_tweets)
-        return jsonify(res['hits']['hits'])
+        return jsonify(valid_tweets)
     else:
         return "no input provided"
     return "no input provided"
