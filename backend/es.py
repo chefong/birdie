@@ -22,7 +22,7 @@ def decode_stacked(document, pos=0, decoder=JSONDecoder()):
 
 def gendata():
     #file path to json file
-    directory = '/Users/johnshin/School/CS172/project/final-project-kirbydownb/backend/tweets.json'
+    directory = '/Users/johnshin/School/CS172/project/final-project-kirbydownb/backend/tweets1.json'
 
     file_input = open(directory, 'r')
     file_read = file_input.read()

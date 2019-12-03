@@ -47,6 +47,7 @@ class StdOutListener(StreamListener):
         try:
             newObject = {}
             tweet = json.loads(data)
+
             if tweet["lang"] == "en":
                 if "extended_tweet" in tweet:
                     newObject["content"] = tweet["extended_tweet"]["full_text"]

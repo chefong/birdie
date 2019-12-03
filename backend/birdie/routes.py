@@ -42,7 +42,7 @@ def query():
           }
         }
 
-        res = es.search(index="testingtwo", body=query)
+        res = es.search(index="tweetes", body=query)
         tweetObjects = res['hits']['hits']
 
         for tweet_json in tweetObjects:
