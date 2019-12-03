@@ -1,3 +1,12 @@
+# Instructions to Run:
+Docker container is utilized, so this cannot be run on other computers at this time.
+
+1. `npm install`
+2. `npm start`
+3. `backend/app.py`
+4. `backend/tweets.py` (streams tweets)
+5. `es.py` (inserts into elasticsearch)
+
 # Birdie
 Birdie is a web application that scrapes, indexes, and visualizes tweets from Twitter on a map.
 
