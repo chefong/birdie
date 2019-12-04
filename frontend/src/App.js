@@ -3,28 +3,32 @@ import './App.css';
 import Map from './components/Map/Map';
 import Panel from './components/Panel/Panel';
 import { geolocated } from "react-geolocated";
-import { sampleData } from './sampleData';
 import { Spin, Icon } from 'antd';
 import birdie from './assets/birdie.svg';
-import { tweets } from './tweet';
 
 class App extends Component {
   state = {
-    data: null
+    userViewport: null,
+    coordinates: [],
+    hoveredTweetCoordinates: []
   }
 
   setData = data => {
-    this.setState({ data: sampleData });
+    const mapCoordinates = data.map(({ _source: { coordinates } }) => coordinates);
+    this.setState({ coordinates: mapCoordinates });
   }
 
-  clearMapData = () => {
-    this.setState({ data: null });
-  }
+  clearMapData = () => this.setState({ data: null });
+
+  setLatLong = (latitude, longitude) => this.setState({ latitude, longitude });
+
+  setHoveredTweetCoordinates = coordinates => this.setState({ hoveredTweetCoordinates: coordinates });
 
   render() {
-    const { data } = this.state;
+    const { latitude, longitude, hoveredTweetCoordinates } = this.state;
+    const { coords, isGeolocationEnabled } = this.props;
 
-    return !this.props.isGeolocationEnabled ? (
+    return !isGeolocationEnabled ? (
       <div className="App__geoUnavailable">
         <div className="App__birdie--container">
           <img className="App__birdie" src={birdie} alt=""/>
@@ -33,10 +37,22 @@ class App extends Component {
           Sorry, <strong>birdie</strong> had trouble getting your location...
         </div>
       </div>
-    ) : this.props.coords ? (
+    ) : coords && coords.latitude && coords.longitude ? (
       <div className="App">
-        <Map data={data} userCoordinates={[this.props.coords.latitude, this.props.coords.longitude]} />
-        <Panel setData={this.setData} clearMapData={this.clearMapData} />
+        <Map
+          initialLatitude={coords.latitude}
+          initialLongitude={coords.longitude}
+          setLatLong={this.setLatLong}
+          coordinates={this.state.coordinates}
+          hoveredTweetCoordinates={hoveredTweetCoordinates}
+        />
+        <Panel
+          latitude={latitude || coords.latitude}
+          longitude={longitude || coords.longitude}
+          setData={this.setData}
+          clearMapData={this.clearMapData}
+          setHoveredTweetCoordinates={this.setHoveredTweetCoordinates}
+        />
       </div>
     ) : (
       <div className="App__loading--container">
@@ -59,5 +75,5 @@ class App extends Component {
 export default geolocated({
   positionOptions: {
     enableHighAccuracy: true,
-  },
+  }
 })(App);

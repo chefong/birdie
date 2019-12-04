@@ -4,14 +4,23 @@ import Fade from 'react-reveal/Fade';
 import { getTimeSince } from '../../../../helpers';
 
 class Tweet extends Component {
+  handleTweetHover = (e, coordinates) => {
+    e.preventDefault();
+    this.props.handleTweetHover(coordinates);
+  }
+
   render() {
-    const { user, entities: { hashTags }, text, created_at: timestamp } = this.props;
+    const { user, entities: { hashTags }, content: text, date: timestamp, coordinates } = this.props;
     const { name, url: profileUrl, profile_image_url_https: profileImageUrl, screen_name: screenName } = user;
     const timeSince = getTimeSince(timestamp);
 
     return (
       <Fade>
-        <div className="tweet__container">
+        <div
+          className="tweet__container"
+          onMouseEnter={e => this.handleTweetHover(e, coordinates)}
+          onMouseLeave={e => this.handleTweetHover(e, [])}
+        >
           <div className="container-fluid">
             <div className="row">
               <div className="col-2">

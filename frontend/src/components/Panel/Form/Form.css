@@ -22,9 +22,14 @@
   margin-top: 5vh
 }
 
-.form__query, .ant-calendar-picker-input, .ant-select-selection {
+.form__query, .ant-input, .ant-calendar-picker-input, .ant-select-selection {
   background-color: rgb(245, 245, 245);
   border: none;
+  border-radius: 0px;
+}
+
+.ant-select {
+  background-color: rgb(230, 230, 230);
 }
 
 .form__loading--wrapper, .form__alert {

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import './Map.css';
-import ReactMapGL, { Layer, Source, Marker } from 'react-map-gl';
-import { heatMapLayer } from '../../heatMapLayer';
+import ReactMapGL, { Marker } from 'react-map-gl';
 import { mapboxStyle, MAP_OFFSET, MAP_ZOOM, SAN_FRANCISCO_COORDS } from '../../constants';
 import Pin from './Pin';
+import dot from './dot.svg';
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_PUBLIC;
 const [SAN_FRANCISCO_LAT, SAN_FRANCISCO_LONG] = SAN_FRANCISCO_COORDS;
@@ -16,43 +16,48 @@ class Map extends Component {
       latitude: SAN_FRANCISCO_LAT,
       longitude: SAN_FRANCISCO_LONG - MAP_OFFSET,
       zoom: MAP_ZOOM
-    },
-    userLatitude: SAN_FRANCISCO_LAT,
-    userLongitude: SAN_FRANCISCO_LONG - MAP_OFFSET
+    }
   };
 
   componentDidMount = () => {
-    const [userLatitude, userLongitude] = this.props.userCoordinates;
+    const { initialLatitude, initialLongitude } = this.props;
     this.setState(prevState => ({
-      userLatitude,
-      userLongitude,
       viewport: {
         ...prevState.viewport,
-        latitude: userLatitude,
-        longitude: userLongitude - MAP_OFFSET
+        latitude: initialLatitude,
+        longitude: initialLongitude - MAP_OFFSET
       }
     }));
   }
 
+  handleViewportChange = viewport => {
+    this.setState({ viewport });
+    const { latitude, longitude } = viewport;
+    this.props.setLatLong(latitude, longitude);
+  }
+
   render() {
-    const { data } = this.props;
-    const { userLatitude, userLongitude } = this.state;
+    const { initialLatitude, initialLongitude, coordinates, hoveredTweetCoordinates } = this.props;
+    const [hoveredTweetLatitude, hoveredTweetLongitude] = hoveredTweetCoordinates;
 
     return (
       <div className="map__container">
         <ReactMapGL
           {...this.state.viewport}
           mapboxApiAccessToken={MAPBOX_TOKEN}
-          onViewportChange={(viewport) => this.setState({viewport})}
+          onViewportChange={(viewport) => this.handleViewportChange(viewport)}
           mapStyle={mapboxStyle}
         >
-          {data && (
-            <Source type="geojson" data={data}>
-              <Layer {...heatMapLayer} />
-            </Source>
-          )}
-          <Marker longitude={userLongitude} latitude={userLatitude}>
-            <Pin size={30}/>
+          {coordinates && coordinates.map(([latitude, longitude]) => {
+            const coordinatesMatch = latitude === hoveredTweetLatitude && longitude === hoveredTweetLongitude;
+            return (
+              <Marker longitude={longitude} latitude={latitude}>
+                <Pin size={coordinatesMatch ? 45 : 30} fill={coordinatesMatch ? "#000" : "#d00"} />
+              </Marker>
+            )
+          })}
+          <Marker longitude={initialLongitude} latitude={initialLatitude}>
+            <img className="map__userLocation" src={dot} alt=""/>
           </Marker>
         </ReactMapGL>
       </div>

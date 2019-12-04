@@ -11,8 +11,12 @@ class Results extends Component {
     this.props.clearData();
   }
 
+  handleTweetHover = coordinates => {
+    this.props.handleTweetHover(coordinates);
+  }
+
   render() {
-    const { data: { tweets } } = this.props;
+    const { data } = this.props;
 
     return (
       <Fade>
@@ -38,9 +42,9 @@ class Results extends Component {
             <div className="row justify-content-center">
               <div className="col-12">
                 <div className="results__data">
-                  {tweets.length > 0 && tweets.map(tweet => {
-                    const { id } = tweet;
-                    return <Tweet key={id} {...tweet} />
+                  {data && data.length > 0 && data.map(tweet => {
+                    const { _id: id, _source: source } = tweet;
+                    return <Tweet key={id} {...source} handleTweetHover={this.handleTweetHover} />
                   })}
                 </div>
               </div>

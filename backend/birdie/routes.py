@@ -28,6 +28,7 @@ def query():
         # Coordinates come in as latitude, longitude
         latitude = data["latitude"]
         longitude = data["longitude"]
+        is_distance_restricted = data["isDistanceRestricted"]
 
         print("latitude: ", latitude)
         print("longitude: ", longitude)
@@ -46,7 +47,9 @@ def query():
         tweetObjects = res['hits']['hits']
 
         for tweet_json in tweetObjects:
-            if len(tweet_json['_source']['coordinates']) > 0:
+            if not is_distance_restricted:
+              valid_tweets.append(tweet_json)
+            elif len(tweet_json['_source']['coordinates']) > 0:
                 # Tweet coordinates come in as latitude, longitude
                 tweet_coord_lat = tweet_json['_source']['coordinates'][0]
                 tweet_coord_long = tweet_json['_source']['coordinates'][1]
@@ -57,6 +60,7 @@ def query():
                     print(tweet_json)
                     print(distance)
                     valid_tweets.append(tweet_json)
+
 
         return jsonify(valid_tweets)
     else:

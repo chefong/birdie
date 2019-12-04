@@ -16,18 +16,23 @@ class Panel extends Component {
   clearData = () => {
     this.setState({ data: null });
     this.props.clearMapData();
-  };
+  }
+
+  handleTweetHover = coordinates => {
+    this.props.setHoveredTweetCoordinates(coordinates);
+  }
 
   render() {
     const { data } = this.state;
+    const { latitude, longitude } = this.props;
 
     return (
       <div className="panel__container">
         <div className="container-fluid">
           {!data ? (
-            <Form handleSubmit={this.handleSubmit} />
+            <Form handleSubmit={this.handleSubmit} latitude={latitude} longitude={longitude} />
           ) : (
-            <Results data={data} clearData={this.clearData} />
+            <Results data={data} clearData={this.clearData} handleTweetHover={this.handleTweetHover} />
           )}
         </div>
       </div>

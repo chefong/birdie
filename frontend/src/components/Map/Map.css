@@ -5,3 +5,7 @@
 .map__pin {
   width: 6vh;
 }
+
+.map__userLocation {
+  width: 196px;
+}

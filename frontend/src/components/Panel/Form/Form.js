@@ -1,68 +1,67 @@
 import React, { Component } from 'react';
 import './Form.css';
 import logo from '../../../assets/logo.svg';
-import { Input, DatePicker, Slider, Button, Spin, Icon, Select, Alert } from 'antd';
+import { Input, DatePicker, Slider, Button, Spin, Icon, Select, Alert, Switch } from 'antd';
 import { BASE_URL } from '../../../constants';
 import axios from 'axios';
 import Fade from 'react-reveal/Fade';
+import moment from 'moment';
+
+const { Option } = Select;
 
 class Form extends Component {
   state = {
     date: '',
     query: '',
+    searchBy: 'Content',
     isLoading: false,
+    isDistanceRestricted: true,
     distance: 100,
-    hashTags: []
+    hashTags: [],
   }
 
   handleInputChange = e => this.setState({ [e.target.name]: e.target.value });
 
   handleDistanceChange = distance => this.setState({ distance });
 
-  handleDateChange = (date, dateString) => this.setState({ date });
+  handleDateChange = date => this.setState({ date: moment().toDate(date) });
 
   handleSelectChange = hashTags => this.setState({ hashTags });
+
+  handleToggleChange = toggled => this.setState({ isDistanceRestricted: toggled });
+
+  handleSearchByChange = value => this.setState({ searchBy: value });
 
   handleClick = e => {
     e.preventDefault();
     
     this.setState({ isLoading: true });
 
-    const { query, date, distance, hashTags } = this.state;
-    const data = { query, date, distance, hashTags };
+    const { query, date, distance, hashTags, isDistanceRestricted, searchBy } = this.state;
+    const { latitude, longitude } = this.props;
+    const data = { query, date, distance, hashTags, latitude, longitude, isDistanceRestricted, searchBy };
 
-    // setTimeout(() => {
-    //   this.props.handleSubmit(data);
-    //   this.setState({ isLoading: false });
-    // }, 1000);
+    console.log("Posting data", data);
 
-    // Here I'm just getting tweets from my home page for now
-    axios.get(`${BASE_URL}/getTweets`)
+    axios.post(`${BASE_URL}/search`, { ...data })
       .then(response => {
-        const { data } = response;
-        this.props.handleSubmit(data);
+        console.log("Got response after submitting form", response);
+        const { data, status, message } = response;
+        if (status !== 200) {
+          throw new Error(message);
+        } else {
+          this.props.handleSubmit(data);
+          this.setState({ isLoading: false });
+        }
       })
-      .catch(error => console.error(error));
-
-    // axios.post(`${BASE_URL}/search`, { ...data })
-    //   .then(response => {
-    //     console.log("Got response after submitting form", response);
-    //     const { data, status, message } = response;
-    //     if (status !== 200) {
-    //       throw new Error(message);
-    //     } else {
-    //       this.props.handleSubmit(data);
-    //       this.setState({ isLoading: false });
-    //     }
-    //   })
-    //   .catch(error => {
-    //     console.log("Error after submitting form", error);
-    //     this.setState({ isLoading: false });
-    //   });
+      .catch(error => {
+        console.log("Error after submitting form", error);
+        this.setState({ isLoading: false });
+      });
   }
 
   render() {
-    const { query, distance, isLoading, message } = this.state;
+    const { query, distance, isLoading, message, isDistanceRestricted, searchBy } = this.state;
     
     return (
       <div className="form__container">
@@ -73,13 +72,19 @@ class Form extends Component {
           <Fade>
             <div className="row justify-content-center">
               <div className="col-10">
-                <div className="form__label">Search Tweets</div>
+                <div className="form__label">{`Search by ${searchBy}`}</div>
                 <Input
-                  placeholder="Search for a tweet..."
+                  placeholder={`Search by ${searchBy.toLowerCase()}`}
                   name="query"
                   onChange={this.handleInputChange}
                   value={query}
                   className="form__query"
+                  addonBefore={
+                    <Select onChange={this.handleSearchByChange} defaultValue="Content" style={{ width: 90 }}>
+                      <Option value="Content">Content</Option>
+                      <Option value="Title">Title</Option>
+                    </Select>
+                  }
                 />
               </div>
             </div>
@@ -95,11 +100,11 @@ class Form extends Component {
             </div>
             <div className="row justify-content-center">
               <div className="col-10">
-                <div className="form__label">Hash Tags</div>
+                <div className="form__label">Hashtags</div>
                 <Select
                   mode="tags"
                   style={{ width: '100%' }}
-                  placeholder="Tags Mode"
+                  placeholder="Enter hashtags"
                   onChange={this.handleSelectChange}
                   className="form__select"
                 >
@@ -113,6 +118,17 @@ class Form extends Component {
                   onChange={this.handleDistanceChange}
                   tooltipPlacement="bottom"
                   defaultValue={distance}
+                  disabled={!isDistanceRestricted}
+                />
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-10">
+                <div className="form__label">Restrict Distance</div>
+                <Switch
+                  className="form__toggle"
+                  onChange={this.handleToggleChange}
+                  checked={isDistanceRestricted}
                 />
               </div>
             </div>
