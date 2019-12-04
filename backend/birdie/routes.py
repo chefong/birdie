@@ -29,19 +29,32 @@ def query():
         latitude = data["latitude"]
         longitude = data["longitude"]
         is_distance_restricted = data["isDistanceRestricted"]
+        searchBy = data["searchBy"]
 
         print("latitude: ", latitude)
         print("longitude: ", longitude)
 
-        query = {
-          "query": {
-            "bool" : {
-              "must" : {
-                "match" : { "content": input }
+        if searchBy == 'title':
+            query = {
+              "query": {
+                "bool" : {
+                  "must" : {
+                    "match" : { "title": input }
+                  }
+                }
               }
             }
-          }
-        }
+        
+        else:
+            query = {
+              "query": {
+                "bool" : {
+                  "must" : {
+                    "match" : { "content": input }
+                  }
+                }
+              }
+            }
 
         res = es.search(index="tweetes", body=query)
         tweetObjects = res['hits']['hits']
