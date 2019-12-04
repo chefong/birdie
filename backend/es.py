@@ -41,7 +41,6 @@ def gendata():
         }
 
 
-
 if __name__ == '__main__':
     # by default we connect to localhost:9200
     es = Elasticsearch("https://ayvv1ysa0x:5yb4lybdko@tweets-2904168154.us-west-2.bonsaisearch.net:443")
