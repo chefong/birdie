@@ -1,3 +1,4 @@
+from birdie import app
 from flask import jsonify, json, request
 from elasticsearch import Elasticsearch
 from math import radians, cos, sin, asin, sqrt # For coord radii
