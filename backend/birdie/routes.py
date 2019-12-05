@@ -2,6 +2,7 @@ from birdie import app
 from flask import jsonify, json, request
 from elasticsearch import Elasticsearch
 from math import radians, cos, sin, asin, sqrt # For coord radii
+from smallestenclosingcircle import make_circle
 
 # Haversine formula code referred heavily to: https://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
 def coord_dist(long1, lat1, long2, lat2):
@@ -58,6 +59,9 @@ def query():
 
         res = es.search(index="tweetes", body=query)
         tweetObjects = res['hits']['hits']
+        # List of pairs representing coordinates
+        # Lat = Y, Long = X, per https://gis.stackexchange.com/a/68856
+        coords = []
 
         for tweet_json in tweetObjects:
             if not is_distance_restricted:
@@ -68,12 +72,18 @@ def query():
                 tweet_coord_long = tweet_json['_source']['coordinates'][1]
 
                 distance = coord_dist(tweet_coord_long, tweet_coord_lat, longitude, latitude)
+                coords.append(tuple((tweet_coord_long, tweet_coord_lat)))
 
                 if distance <= 100:
                     print(tweet_json)
                     print(distance)
                     valid_tweets.append(tweet_json)
 
+        circle = make_circle(coords)
+        center_x = circle[0]
+        center_y = circle[1]
+        # radius = circle[2]
+        valid_tweets["Center"] = [(9, 8)]
 
         return jsonify(valid_tweets)
     else:
