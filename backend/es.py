@@ -22,14 +22,14 @@ def decode_stacked(document, pos=0, decoder=JSONDecoder()):
 
 def gendata():
     #file path to json file
-    directory = '/Users/johnshin/School/CS172/project/final-project-kirbydownb/backend/tweets1.json'
+    directory = 'tweetsParsed.json'
 
     file_input = open(directory, 'r')
     file_read = file_input.read()
 
     for obj in decode_stacked(file_read):
         yield {
-            "_index": "tweetes",
+            "_index": "tweet172",
             "_source": {
                 "content": obj["content"],
                 "coordinates": obj["coordinates"],

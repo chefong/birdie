@@ -32,21 +32,25 @@ def decode_stacked(document, pos=0, decoder=JSONDecoder()):
 def scrapePage(urls, newObject):
     url = urls[0]["expanded_url"]
 
-    if "twitter" not in url and "instagram" not in url: #don't want urls to other tweets
-        webpage = urllib.request.urlopen(url).read()
-        title = str(webpage).split('<title>')[1].split('</title>')[0]
+    try:
+        if "twitter" not in url and "instagram" not in url: #don't want urls to other tweets
+            webpage = urllib.request.urlopen(url).read()
+            title = str(webpage).split('<title>')[1].split('</title>')[0]
 
-        if len(title) > 0:
-            title = title.translate(str.maketrans('', '', string.punctuation))
-            printable = set(string.printable)
-            filter(lambda x: x in printable, title) #gets rid of hex values in titles
+            if len(title) > 0:
+                title = title.translate(str.maketrans('', '', string.punctuation))
+                printable = set(string.printable)
+                filter(lambda x: x in printable, title) #gets rid of hex values in titles
 
-            newObject["title"] = title
-            newObject["url"] = url
+                newObject["title"] = title
+                newObject["url"] = url
+    except:
+        print("failed url parse")
+        pass
 
 def filterJson():
     #file path to json file
-    directory = '/Users/johnshin/School/CS172/project/final-project-kirbydownb/backend/tweets.json'
+    directory = 'tweets.json'
 
     file_input = open(directory, 'r')
     file_read = file_input.read()
@@ -75,7 +79,6 @@ def filterJson():
             if len(tweet["entities"]["urls"]) > 0:
                 scrapePage(tweet["entities"]["urls"], newObject)
 
-
             try:
                 newObject["coordinates"] = tweet["coordinates"]["coordinates"]
             except:
@@ -93,10 +96,10 @@ def filterJson():
                     global count
                     print(count)
                     count += 1
-
                     json.dump(newObject, tf)
 
 
-if __name__ == '__main__':
 
+
+if __name__ == '__main__':
     filterJson()
