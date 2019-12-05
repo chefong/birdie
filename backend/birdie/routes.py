@@ -2,6 +2,7 @@ from birdie import app
 from flask import jsonify, json, request
 from elasticsearch import Elasticsearch
 from math import radians, cos, sin, asin, sqrt # For coord radii
+from smallestenclosingcircle import make_circle
 
 # Haversine formula code referred heavily to: https://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
 def coord_dist(long1, lat1, long2, lat2):
@@ -15,6 +16,19 @@ def coord_dist(long1, lat1, long2, lat2):
     c = 2 * asin(sqrt(a))
     r = 3956 # Radius of Earth in miles
     return c * r
+
+# Brute force method to calculate farthest points
+def farthest_points(points):
+    dist = 0
+    i = 0
+    for i < len(points) - 1:
+        j = i + 1
+        for j < len(points):
+            curr_dist = sqrt((points[i] - points[j])**2 + (points[i] - points[j])**2)
+            dist = max(dist, curr_dist)
+            j += 1
+        i += 1
+    return dist
 
 @app.route("/search", methods=["POST"])
 def query():
@@ -58,6 +72,9 @@ def query():
 
         res = es.search(index="tweetes", body=query)
         tweetObjects = res['hits']['hits']
+        # List of pairs representing coordinates
+        # Lat = Y, Long = X, per https://gis.stackexchange.com/a/68856
+        coords = []
 
         for tweet_json in tweetObjects:
             if not is_distance_restricted:
@@ -68,12 +85,21 @@ def query():
                 tweet_coord_long = tweet_json['_source']['coordinates'][1]
 
                 distance = coord_dist(tweet_coord_long, tweet_coord_lat, longitude, latitude)
+                coords.append(tuple((tweet_coord_long, tweet_coord_lat)))
 
                 if distance <= 100:
                     print(tweet_json)
                     print(distance)
                     valid_tweets.append(tweet_json)
 
+        circle = make_circle(coords)
+        center_x = circle[0]
+        center_y = circle[1]
+        # radius = circle[2]
+        valid_tweets["Center"] = [(9, 8)]
+
+        max_dist = farthest_points(coords)
+        valid_tweets["Max Dist"] = max_dist
 
         return jsonify(valid_tweets)
     else:
