@@ -10,7 +10,15 @@ class App extends Component {
   state = {
     userViewport: null,
     coordinates: [],
-    hoveredTweetCoordinates: []
+    hoveredTweetCoordinates: [],
+    draggableMarkerCoordinates: []
+  }
+
+  componentDidMount = () => {
+    const { coords } = this.props;
+    if (coords) {
+      this.setState({ draggableMarkerCoordinates: [coords.latitude, coords.longitude] })
+    }
   }
 
   setData = data => {
@@ -20,12 +28,12 @@ class App extends Component {
 
   clearMapData = () => this.setState({ data: null });
 
-  setLatLong = (latitude, longitude) => this.setState({ latitude, longitude });
-
   setHoveredTweetCoordinates = coordinates => this.setState({ hoveredTweetCoordinates: coordinates });
 
+  setDraggableMarkerCoordinates = coordinates => this.setState({ draggableMarkerCoordinates: coordinates });
+
   render() {
-    const { latitude, longitude, hoveredTweetCoordinates } = this.state;
+    const { hoveredTweetCoordinates, draggableMarkerCoordinates } = this.state;
     const { coords, isGeolocationEnabled } = this.props;
 
     return !isGeolocationEnabled ? (
@@ -42,13 +50,12 @@ class App extends Component {
         <Map
           initialLatitude={coords.latitude}
           initialLongitude={coords.longitude}
-          setLatLong={this.setLatLong}
           coordinates={this.state.coordinates}
           hoveredTweetCoordinates={hoveredTweetCoordinates}
+          setDraggableMarkerCoordinates={this.setDraggableMarkerCoordinates}
         />
         <Panel
-          latitude={latitude || coords.latitude}
-          longitude={longitude || coords.longitude}
+          draggableMarkerCoordinates={draggableMarkerCoordinates}
           setData={this.setData}
           clearMapData={this.clearMapData}
           setHoveredTweetCoordinates={this.setHoveredTweetCoordinates}

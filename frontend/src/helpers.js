@@ -1,6 +1,7 @@
 import moment from 'moment';
+import { PIN_SIZE_ORIGINAL, PIN_SIZE_SCALED } from './constants';
 
-export function getTimeSince(timestamp) {
+export const getTimeSince = timestamp => {
   const minutesSince = moment().diff(timestamp, "minutes");
   const hoursSince = moment().diff(timestamp, "hours");
   const daysSince = moment().diff(timestamp, "days");
@@ -39,3 +40,5 @@ export function getTimeSince(timestamp) {
 
   return timeSince + " ago";
 }
+
+export const setPinStyle = (coordinatesMatch, defaultValue, newValue) => coordinatesMatch ? newValue : defaultValue;

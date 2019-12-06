@@ -15,8 +15,8 @@ class Pin extends PureComponent {
         style={{
           transform: `translate(${-size / 2}px,${-size}px)`,
           transition: "0.25s",
-          fill: fill,
-          stroke: 'none'
+          stroke: 'none',
+          fill
         }}
         onClick={onClick}
       >

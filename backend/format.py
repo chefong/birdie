@@ -50,8 +50,8 @@ def scrapePage(urls, newObject):
 
 def filterJson():
     #file path to json file
-    directory = 'tweets.json'
 
+    directory = 'tweets.json'
     file_input = open(directory, 'r')
     file_read = file_input.read()
 

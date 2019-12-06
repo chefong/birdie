@@ -24,13 +24,16 @@ class Panel extends Component {
 
   render() {
     const { data } = this.state;
-    const { latitude, longitude } = this.props;
+    const { draggableMarkerCoordinates } = this.props;
 
     return (
       <div className="panel__container">
         <div className="container-fluid">
           {!data ? (
-            <Form handleSubmit={this.handleSubmit} latitude={latitude} longitude={longitude} />
+            <Form
+              handleSubmit={this.handleSubmit}
+              draggableMarkerCoordinates={draggableMarkerCoordinates}
+            />
           ) : (
             <Results data={data} clearData={this.clearData} handleTweetHover={this.handleTweetHover} />
           )}

@@ -9,3 +9,8 @@
 .map__userLocation {
   width: 196px;
 }
+
+.map__draggablePin {
+  width: 15px;
+  display: block;
+}

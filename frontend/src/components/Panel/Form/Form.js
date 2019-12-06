@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './Form.css';
 import logo from '../../../assets/logo.svg';
 import { Input, DatePicker, Slider, Button, Spin, Icon, Select, Alert, Switch } from 'antd';
-import { BASE_URL } from '../../../constants';
+import { BASE_URL, NO_RESULT_MESSAGE } from '../../../constants';
 import axios from 'axios';
 import Fade from 'react-reveal/Fade';
 import moment from 'moment';
@@ -13,6 +13,7 @@ class Form extends Component {
   state = {
     date: '',
     query: '',
+    message: '',
     searchBy: 'Content',
     isLoading: false,
     isDistanceRestricted: true,
@@ -24,7 +25,7 @@ class Form extends Component {
 
   handleDistanceChange = distance => this.setState({ distance });
 
-  handleDateChange = date => this.setState({ date: moment().toDate(date) });
+  handleDateChange = date => this.setState({ date });
 
   handleSelectChange = hashTags => this.setState({ hashTags });
 
@@ -32,14 +33,35 @@ class Form extends Component {
 
   handleSearchByChange = value => this.setState({ searchBy: value });
 
+  componentDidMount = () => {
+    const query = localStorage.getItem("query");
+    const searchBy = localStorage.getItem("searchBy");
+    const isDistanceRestricted = localStorage.getItem("isDistanceRestricted");
+    const distance = localStorage.getItem("distance");
+    const hashTags = localStorage.getItem("hashTags");
+    if (query && searchBy && isDistanceRestricted && distance && hashTags) {
+      this.setState({ query, searchBy, isDistanceRestricted, distance, hashTags });
+    }
+  }
+
+  componentDidUpdate = () => {
+    const { query, searchBy, isDistanceRestricted, distance, hashTags } = this.state;
+    localStorage.setItem("query", query);
+    localStorage.setItem("searchBy", searchBy);
+    localStorage.setItem("isDistanceRestricted", isDistanceRestricted);
+    localStorage.setItem("distance", distance);
+    localStorage.setItem("hashTags", hashTags);
+  }
+
   handleClick = e => {
     e.preventDefault();
     
     this.setState({ isLoading: true });
 
-    const { query, date, distance, hashTags, isDistanceRestricted, searchBy } = this.state;
-    const { latitude, longitude } = this.props;
-    const data = { query, date, distance, hashTags, latitude, longitude, isDistanceRestricted, searchBy };
+    const { query, distance, hashTags, isDistanceRestricted, searchBy, date } = this.state;
+    const { draggableMarkerCoordinates } = this.props;
+    const [latitude, longitude] = draggableMarkerCoordinates;
+    const data = { query, numResults: 200, date: moment().toDate(date), distance, hashTags, latitude, longitude, isDistanceRestricted, searchBy };
 
     console.log("Posting data", data);
 
@@ -47,12 +69,16 @@ class Form extends Component {
       .then(response => {
         console.log("Got response after submitting form", response);
         const { data, status, message } = response;
+        const { result } = data;
         if (status !== 200) {
           throw new Error(message);
+        } else if (result && result.length === 0) {
+          this.setState({ message: NO_RESULT_MESSAGE });
         } else {
-          this.props.handleSubmit(data);
-          this.setState({ isLoading: false });
+          this.setState({ message: "" });
+          this.props.handleSubmit(result);
         }
+        this.setState({ isLoading: false });
       })
       .catch(error => {
         console.log("Error after submitting form", error);
@@ -61,7 +87,7 @@ class Form extends Component {
   }
 
   render() {
-    const { query, distance, isLoading, message, isDistanceRestricted, searchBy } = this.state;
+    const { query, distance, isLoading, message, isDistanceRestricted, searchBy, hashTags, date } = this.state;
     
     return (
       <div className="form__container">
@@ -80,7 +106,7 @@ class Form extends Component {
                   value={query}
                   className="form__query"
                   addonBefore={
-                    <Select onChange={this.handleSearchByChange} defaultValue="Content" style={{ width: 90 }}>
+                    <Select onChange={this.handleSearchByChange} value={searchBy} defaultValue={searchBy} style={{ width: 90 }}>
                       <Option value="Content">Content</Option>
                       <Option value="Title">Title</Option>
                     </Select>
@@ -107,6 +133,7 @@ class Form extends Component {
                   placeholder="Enter hashtags"
                   onChange={this.handleSelectChange}
                   className="form__select"
+                  value={hashTags}
                 >
                 </Select>
               </div>
