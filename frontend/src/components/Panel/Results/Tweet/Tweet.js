@@ -10,7 +10,7 @@ class Tweet extends Component {
   }
 
   render() {
-    const { user, entities: { hashTags }, content: text, date: timestamp, coordinates } = this.props;
+    const { user, content: text, date: timestamp, coordinates } = this.props;
     const { name, url: profileUrl, profile_image_url_https: profileImageUrl, screen_name: screenName } = user;
     const timeSince = getTimeSince(timestamp);
 

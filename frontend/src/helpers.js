@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { PIN_SIZE_ORIGINAL, PIN_SIZE_SCALED } from './constants';
 
 export const getTimeSince = timestamp => {
   const minutesSince = moment().diff(timestamp, "minutes");

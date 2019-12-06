@@ -8,7 +8,7 @@ import Tweet from './Tweet/Tweet';
 class Results extends Component {
   handleBackClick = e => {
     e.preventDefault();
-    this.props.clearData();
+    this.props.clearMapData();
   }
 
   handleTweetHover = coordinates => {
@@ -37,6 +37,11 @@ class Results extends Component {
                 <div className="results__logo--wrapper">
                   <img className="results__logo" src={logo} alt=""/>
                 </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-12-">
+                <div className="results__numResults">{data.length} {data.length > 1 ? "results" : "result"}</div>
               </div>
             </div>
             <div className="row justify-content-center">

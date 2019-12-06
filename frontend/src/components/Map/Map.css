@@ -14,3 +14,9 @@
   width: 15px;
   display: block;
 }
+
+.map__popupScore {
+  font-weight: bold;
+  padding: 10px;
+  padding-bottom: 4px;
+}

@@ -1,12 +1,14 @@
 // Mapbox style URL
 export const mapboxStyle = 'mapbox://styles/eong001/ck3ca2yvh1far1coadjxnz7a7';
 
-// Backend URL
-export const BASE_URL = 'http://add17c15.ngrok.io';
+// Stuff for backend
+export const BASE_URL = 'http://127.0.0.1:5000';
+export const NUM_SEARCH_RESULTS = 250;
 
 // Map settings
 export const MAP_OFFSET = 0.165;
 export const MAP_ZOOM = 10;
+export const ADJUSTED_MAP_ZOOM = 4;
 export const initialMapData = {
   type: "FeatureCollection",
   crs: {

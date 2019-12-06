@@ -8,12 +8,13 @@ class Panel extends Component {
     data: null
   }
 
-  handleSubmit = data => {
+  handleSubmit = (data, maxDistance) => {
     this.setState({ data });
     this.props.setData(data);
+    this.props.setMaxDistance(maxDistance);
   }
 
-  clearData = () => {
+  clearMapData = () => {
     this.setState({ data: null });
     this.props.clearMapData();
   }
@@ -35,7 +36,7 @@ class Panel extends Component {
               draggableMarkerCoordinates={draggableMarkerCoordinates}
             />
           ) : (
-            <Results data={data} clearData={this.clearData} handleTweetHover={this.handleTweetHover} />
+            <Results data={data} clearMapData={this.clearMapData} handleTweetHover={this.handleTweetHover} />
           )}
         </div>
       </div>

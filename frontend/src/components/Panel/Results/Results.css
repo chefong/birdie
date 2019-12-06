@@ -27,7 +27,12 @@
   vertical-align: 0.1em;
 }
 
+.results__numResults {
+  margin-top: 2vh;
+  font-weight: bold;
+}
+
 .results__data {
-  margin-top: 4vh;
+  margin-top: 2vh;
   margin-bottom: 4vh;
 }

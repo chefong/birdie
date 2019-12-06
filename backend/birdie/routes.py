@@ -19,6 +19,26 @@ from haversine import haversine, Unit
 #         i += 1
 #     return dist
 
+def getCoordinates(tweetObjects):
+  all_coordinates = []
+
+  for tweet_json in tweetObjects:
+    coordinates = tweet_json['_source']['coordinates']
+    all_coordinates.append(coordinates)
+
+  return all_coordinates
+
+def getMaxDistance(all_coordinates):
+  max_distance = -1
+
+  for i in range(len(all_coordinates)):
+    for j in range(i + 1, len(all_coordinates)):
+      a, b = all_coordinates[i], all_coordinates[j]
+      distance = haversine(a, b, unit=Unit.MILES)
+      max_distance = max(max_distance, distance)
+  
+  return max_distance
+
 @app.route("/search", methods=["POST"])
 def query():
     es = Elasticsearch("https://ayvv1ysa0x:5yb4lybdko@tweets-2904168154.us-west-2.bonsaisearch.net:443")
@@ -34,6 +54,8 @@ def query():
         is_distance_restricted = data["isDistanceRestricted"]
         searchBy = data["searchBy"]
         numResults = data["numResults"]
+        user_distance = float(data["distance"])
+        user_hashtags = data["hashTags"]
 
         # print("latitude: ", latitude)
         # print("longitude: ", longitude)
@@ -68,6 +90,21 @@ def query():
         coords = []
 
         for tweet_json in tweetObjects:
+            hashtags = tweet_json['_source']['entities']['hashtags']
+            hashtag_texts = []
+
+            for hashtag in hashtags:
+              text = hashtag['text']
+              hashtag_texts.append(text)
+            
+            skip = False
+            for word in user_hashtags:
+              if word not in hashtag_texts:
+                skip = True
+
+            if skip:
+              continue
+
             if not is_distance_restricted:
               valid_tweets.append(tweet_json)
             elif len(tweet_json['_source']['coordinates']) > 0:
@@ -78,10 +115,14 @@ def query():
 
                 coords.append(tweet_json['_source']['coordinates'])
 
-                if distance <= 100:
-                    # print(tweet_json)
-                    print(distance)
+                if distance <= user_distance:
                     valid_tweets.append(tweet_json)
+
+        all_coordinates = getCoordinates(valid_tweets)
+        print("Got all coordinates")
+        max_distance = getMaxDistance(all_coordinates)
+
+        print("Got max distance", max_distance)
 
         # circle = make_circle(coords)
         # center_x = circle[0]
@@ -91,9 +132,10 @@ def query():
         #
         # max_dist = farthest_points(coords)
         # valid_tweets["Max Dist"] = max_dist
-        print(valid_tweets)
+        # print(valid_tweets)
         return jsonify({
-            "result": valid_tweets
+            "result": valid_tweets,
+            "maxDistance": max_distance
         })
     else:
         return "no input provided"

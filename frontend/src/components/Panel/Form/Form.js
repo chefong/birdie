@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
 import './Form.css';
 import logo from '../../../assets/logo.svg';
-import { Input, DatePicker, Slider, Button, Spin, Icon, Select, Alert, Switch } from 'antd';
-import { BASE_URL, NO_RESULT_MESSAGE } from '../../../constants';
+import { Input, Slider, Button, Spin, Icon, Select, Alert, Switch } from 'antd';
+import { BASE_URL, NO_RESULT_MESSAGE, NUM_SEARCH_RESULTS } from '../../../constants';
 import axios from 'axios';
 import Fade from 'react-reveal/Fade';
-import moment from 'moment';
 
 const { Option } = Select;
 
 class Form extends Component {
   state = {
-    date: '',
     query: '',
     message: '',
     searchBy: 'Content',
@@ -25,8 +23,6 @@ class Form extends Component {
 
   handleDistanceChange = distance => this.setState({ distance });
 
-  handleDateChange = date => this.setState({ date });
-
   handleSelectChange = hashTags => this.setState({ hashTags });
 
   handleToggleChange = toggled => this.setState({ isDistanceRestricted: toggled });
@@ -39,9 +35,12 @@ class Form extends Component {
     const isDistanceRestricted = localStorage.getItem("isDistanceRestricted");
     const distance = localStorage.getItem("distance");
     const hashTags = localStorage.getItem("hashTags");
-    if (query && searchBy && isDistanceRestricted && distance && hashTags) {
-      this.setState({ query, searchBy, isDistanceRestricted, distance, hashTags });
-    }
+
+    if (query) this.setState({ query });
+    if (searchBy) this.setState({ searchBy });
+    if (isDistanceRestricted !== null) this.setState({ isDistanceRestricted });
+    if (distance) this.setState({ distance });
+    if (hashTags.length > 0) this.setState({ hashTags });
   }
 
   componentDidUpdate = () => {
@@ -58,10 +57,10 @@ class Form extends Component {
     
     this.setState({ isLoading: true });
 
-    const { query, distance, hashTags, isDistanceRestricted, searchBy, date } = this.state;
+    const { query, distance, hashTags, isDistanceRestricted, searchBy } = this.state;
     const { draggableMarkerCoordinates } = this.props;
     const [latitude, longitude] = draggableMarkerCoordinates;
-    const data = { query, numResults: 200, date: moment().toDate(date), distance, hashTags, latitude, longitude, isDistanceRestricted, searchBy };
+    const data = { query, numResults: NUM_SEARCH_RESULTS, distance, hashTags, latitude, longitude, isDistanceRestricted, searchBy };
 
     console.log("Posting data", data);
 
@@ -69,14 +68,15 @@ class Form extends Component {
       .then(response => {
         console.log("Got response after submitting form", response);
         const { data, status, message } = response;
-        const { result } = data;
+        const { result, maxDistance } = data;
         if (status !== 200) {
           throw new Error(message);
         } else if (result && result.length === 0) {
           this.setState({ message: NO_RESULT_MESSAGE });
+          this.props.clearMapData();
         } else {
           this.setState({ message: "" });
-          this.props.handleSubmit(result);
+          this.props.handleSubmit(result, maxDistance);
         }
         this.setState({ isLoading: false });
       })
@@ -87,7 +87,7 @@ class Form extends Component {
   }
 
   render() {
-    const { query, distance, isLoading, message, isDistanceRestricted, searchBy, hashTags, date } = this.state;
+    const { query, distance, isLoading, message, isDistanceRestricted, searchBy, hashTags, numResults } = this.state;
     
     return (
       <div className="form__container">
@@ -111,16 +111,6 @@ class Form extends Component {
                       <Option value="Title">Title</Option>
                     </Select>
                   }
-                />
-              </div>
-            </div>
-            <div className="row justify-content-center">
-              <div className="col-10">
-                <div className="form__label">Date</div>
-                <DatePicker
-                  onChange={this.handleDateChange}
-                  className="form__date"
-                  format="MM/DD/YYYY"
                 />
               </div>
             </div>

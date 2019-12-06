@@ -9,7 +9,8 @@ import birdie from './assets/birdie.svg';
 class App extends Component {
   state = {
     userViewport: null,
-    coordinates: [],
+    maxDistance: null,
+    mapData: [],
     hoveredTweetCoordinates: [],
     draggableMarkerCoordinates: []
   }
@@ -22,18 +23,20 @@ class App extends Component {
   }
 
   setData = data => {
-    const mapCoordinates = data.map(({ _source: { coordinates } }) => coordinates);
-    this.setState({ coordinates: mapCoordinates });
+    const mapData = data.map(({ _source: { coordinates }, _score }) => ({ coordinates, score: _score }));
+    this.setState({ mapData });
   }
 
-  clearMapData = () => this.setState({ data: null });
+  setMaxDistance = maxDistance => this.setState({ maxDistance });
+
+  clearMapData = () => this.setState({ mapData: null });
 
   setHoveredTweetCoordinates = coordinates => this.setState({ hoveredTweetCoordinates: coordinates });
 
   setDraggableMarkerCoordinates = coordinates => this.setState({ draggableMarkerCoordinates: coordinates });
 
   render() {
-    const { hoveredTweetCoordinates, draggableMarkerCoordinates } = this.state;
+    const { hoveredTweetCoordinates, draggableMarkerCoordinates, mapData, maxDistance } = this.state;
     const { coords, isGeolocationEnabled } = this.props;
 
     return !isGeolocationEnabled ? (
@@ -50,15 +53,17 @@ class App extends Component {
         <Map
           initialLatitude={coords.latitude}
           initialLongitude={coords.longitude}
-          coordinates={this.state.coordinates}
+          mapData={mapData}
           hoveredTweetCoordinates={hoveredTweetCoordinates}
           setDraggableMarkerCoordinates={this.setDraggableMarkerCoordinates}
+          maxDistance={maxDistance}
         />
         <Panel
           draggableMarkerCoordinates={draggableMarkerCoordinates}
           setData={this.setData}
           clearMapData={this.clearMapData}
           setHoveredTweetCoordinates={this.setHoveredTweetCoordinates}
+          setMaxDistance={this.setMaxDistance}
         />
       </div>
     ) : (

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import './Map.css';
-import ReactMapGL, { Marker } from 'react-map-gl';
+import ReactMapGL, { Marker, Popup } from 'react-map-gl';
 import {
   mapboxStyle,
   MAP_OFFSET,
   MAP_ZOOM,
+  ADJUSTED_MAP_ZOOM,
   SAN_FRANCISCO_COORDS,
   PIN_SIZE_ORIGINAL,
   PIN_SIZE_SCALED,
@@ -14,7 +15,7 @@ import {
 import { setPinStyle } from '../../helpers';
 import Pin from './Pin';
 import DraggablePin from './DraggablePin';
-import dot from './dot.svg';
+import Dot from './Dot';
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_PUBLIC;
 const [SAN_FRANCISCO_LAT, SAN_FRANCISCO_LONG] = SAN_FRANCISCO_COORDS;
@@ -31,7 +32,8 @@ class Map extends Component {
     initialLatitude: null,
     initialLongitude: null,
     draggableMarkerLatitude: null,
-    draggableMarkerLongitude: null
+    draggableMarkerLongitude: null,
+    popupInfo: null
   };
 
   componentDidMount = () => {
@@ -52,7 +54,23 @@ class Map extends Component {
     this.props.setDraggableMarkerCoordinates([initialLatitude, initialLongitude]);
   }
 
+  UNSAFE_componentWillReceiveProps = nextProps => {
+    const { maxDistance: nextMaxDistance } = nextProps;
+    const { maxDistance } = this.props;
+
+    if (maxDistance !== nextMaxDistance) {
+      this.setState(prevState => ({
+        viewport: {
+          ...prevState.viewport,
+          zoom: ADJUSTED_MAP_ZOOM
+        }
+      }));
+    };
+  }
+
   handleViewportChange = viewport => this.setState({ viewport });
+
+  handlePopupClose = () => this.setState({ popupInfo: null });
 
   handleMarkerDragEnd = event => {
     const { lngLat } = event;
@@ -66,9 +84,19 @@ class Map extends Component {
     this.props.setDraggableMarkerCoordinates([draggableMarkerLatitude, draggableMarkerLongitude]);
   };
 
+  handlePinClick = (e, coordinates, score) => {
+    e.preventDefault();
+    this.setState({
+      popupInfo: {
+        score,
+        coordinates
+      }
+    });
+  }
+
   render() {
-    const { draggableMarkerLatitude, draggableMarkerLongitude, } = this.state;
-    const { initialLatitude, initialLongitude, coordinates, hoveredTweetCoordinates } = this.props;
+    const { draggableMarkerLatitude, draggableMarkerLongitude, popupInfo } = this.state;
+    const { initialLatitude, initialLongitude, mapData, hoveredTweetCoordinates } = this.props;
     const [hoveredTweetLatitude, hoveredTweetLongitude] = hoveredTweetCoordinates;
 
     return (
@@ -79,20 +107,33 @@ class Map extends Component {
           onViewportChange={(viewport) => this.handleViewportChange(viewport)}
           mapStyle={mapboxStyle}
         >
-          {coordinates && coordinates.map(([latitude, longitude]) => {
+          {mapData && mapData.map(({ coordinates, score }) => {
+            const [latitude, longitude] = coordinates;
             const coordinatesMatch = latitude === hoveredTweetLatitude && longitude === hoveredTweetLongitude;
             return (
               <Marker longitude={longitude} latitude={latitude}>
                 <Pin
                   size={setPinStyle(coordinatesMatch, PIN_SIZE_ORIGINAL, PIN_SIZE_SCALED)}
                   fill={setPinStyle(coordinatesMatch, PIN_COLOR_ORIGINAL, PIN_COLOR_NEW)}
+                  onClick={e => this.handlePinClick(e, coordinates, score)}
                 />
               </Marker>
             )
           })}
+          {popupInfo && (
+            <Popup
+              latitude={popupInfo.coordinates[0]}
+              longitude={popupInfo.coordinates[1]}
+              onClose={this.handlePopupClose}
+              closeOnClick={false}
+              anchor="top"
+            >
+              <div className="map__popupScore">{popupInfo.score}</div>
+            </Popup>
+          )}
           {initialLongitude && initialLatitude && (
             <Marker longitude={initialLongitude} latitude={initialLatitude}>
-              <img className="map__userLocation" src={dot} alt=""/>
+              <Dot />
             </Marker>
           )}
           {draggableMarkerLongitude && draggableMarkerLatitude && (
