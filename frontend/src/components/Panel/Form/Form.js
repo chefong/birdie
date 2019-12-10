@@ -40,7 +40,7 @@ class Form extends Component {
     if (searchBy) this.setState({ searchBy });
     if (isDistanceRestricted !== null) this.setState({ isDistanceRestricted });
     if (distance) this.setState({ distance });
-    if (hashTags.length > 0) this.setState({ hashTags });
+    if (hashTags && hashTags.length > 0) this.setState({ hashTags });
   }
 
   componentDidUpdate = () => {
